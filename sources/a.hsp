@@ -1,0 +1,2 @@
+axobj ie, "Shell.Explorer.2",640,480
+	ie->"Navigate" dir_cur+"\\Applications\\˜A—.html

@@ -1,0 +1,35 @@
+notesel bootfile
+noteload dir_cur+"\\bootfile.combos"
+noteget bootfile,0
+onerror goto*error 
+boxf
+color 255,255,255
+mes "check files"
+notesel filechktemp
+mes "setup.combos"
+noteload "setup.combos"
+color 0,255,0
+pos 200,20
+mes "done.",0
+mes "combOS in found at\n"+bootfile+"\\GUI.exe"
+mes "Do you want to boot combOS from this file? Y or n"
+repeat
+getkey y,89
+getkey n,78
+if y=1:goto *boot
+if n=1:goto *halt
+wait 3
+loop
+*boot
+	mes "exec
+	exec bootfile+"\\GUI.exe"
+	end
+*halt
+	color 255,0,0
+	mes "boot is canceled. system halted."
+	mes "If you want to boot combOS again, \nplease close this application and restart"
+stop
+*error
+	color 255,0,0
+	pos 200,20
+	mes "error"

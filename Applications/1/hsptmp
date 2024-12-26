@@ -1,0 +1,46 @@
+//ログ
+#include "hsp3util.as"
+getdatestr date
+gettimestr time
+time_data=date+"/"+time+":"+gettime(7)
+notesel log
+noteload "../../combos.log"
+newlog=log+"\n"+time_data+"　暗号テキストエディタ(暗号化)が起動されました。"
+notesel newlog
+notesave "../../combos.log"
+//ログ記入ここまで
+
+#include "\\script\\hspinet.as"
+a=""
+pass=""
+objsize 300,30
+n="暗号化・復号化する文字列を入力してください"
+mesbox n,640,20,0,9999
+mesbox a,640,200,5,9999
+mes "パスワードを入力してください"
+input pass
+button "GO",*go
+stop
+*go
+objsize 300,30
+rc4encode a,pass,999
+objprm 0,"暗号化後の文字列\n"
+objprm 1,a
+notesel a
+button "保存",*save
+button "復号化テストを行う",*test
+button "終了",*ne
+stop
+*save
+dialog "",17,""
+notesave refstr
+*ne
+	end
+*test
+	screen ginfo_newid,640,480,0,-1,-1
+	mes "パスワード\n\n"+pass
+	rc4encode a,pass,-1
+	mes "複号化後の文字列\n\n"+a
+	button "保存",*save
+	button "終了",*ne
+stop

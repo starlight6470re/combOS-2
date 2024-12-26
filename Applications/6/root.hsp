@@ -1,0 +1,64 @@
+//ログ
+#include "hsp3util.as"
+getdatestr date
+gettimestr time
+time_data=date+"/"+time+":"+gettime(7)
+notesel log
+noteload "../../combos.log"
+newlog=log+"\n"+time_data+"　インストーラ用管理者昇格アプリケーションが起動されました。"
+notesel newlog
+notesave "../../combos.log"
+//ログ記入ここまで
+
+#include "\\script\\hspinet.as"
+notesel tenji
+chdir "../../"
+noteload "setupfiles\\tenji.combos"
+if tenji="0":goto *tenjimode
+notesel root
+exist "setupfiles\\rootpass.combos"
+if strsize=-1:goto *nopassroot
+noteload "setupfiles\\rootpass.combos"
+if root="":goto *nopassroot
+goto *rootpass
+*tenjimode
+	dialog "このソフトウェアはcombOSの重要な設定を変更するため\n展示モードでは起動できません。",1
+	end
+*nopassroot
+	screen 0,640,210
+	font "",30
+	mes "このソフトウェア(combOSインストーラ)は\ncombOS管理者権限を要求しています。\n許可しますか?\n(Windowsには何の影響も与えません)",3
+	objmode 2
+	font "",40
+	objsize 640,40
+	pos 0,120
+	button "許可",*exec_installer
+	button "キャンセル",*cancel
+	stop
+*rootpass
+	pass=""
+	screen 0,640,210
+	font "",30
+	mes "このソフトウェア(combOSインストーラ)は\ncombOS管理者権限を要求しています。
+	objsize 640,50
+	objmode 2
+	font "",50
+	input pass
+	button gosub "認証",*check
+	button "キャンセル",*cancel
+	stop
+*check
+	chk=""
+	b64decode chk,root,90
+	if pass=chk:goto *exec_installer
+	dialog "パスワードが一致しません"
+	return
+stop
+*cancel
+	cls
+	mes "このアプリケーションは管理者権限が必要です。\n5秒後に自動的に終了します"
+	wait 500
+	end
+*exec_installer
+	exec "Applications\\6\\6_.exe"
+	end

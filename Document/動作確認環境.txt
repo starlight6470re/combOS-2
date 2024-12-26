@@ -1,0 +1,9 @@
+動作確認環境は以下の通りですが、すべてのPCで動作する保証はございません。
+
+2.Dell Inspiron 11 3179
+CPU:		Intel Core m3 7Y30 1.00GHz
+RAM:		DDR3-1600 オンボード 4GB
+SSD:		SK hynix SC308 SATA 128GB
+グラフィック:	Intel HDグラフィックス 615
+OS:		Windows10 Home 1903
+解像度		1366x768

@@ -1,0 +1,59 @@
+//ログ
+#include "hsp3util.as"
+getdatestr date
+gettimestr time
+time_data=date+"/"+time+":"+gettime(7)
+notesel log
+noteload "combos.log"
+newlog=log+"\n"+time_data+"	終了オプションが起動しました。"
+notesel newlog
+notesave "combos.log"
+//ログ記入ここまで
+screen 0,200,100,
+	mes "combOS電源オプション"
+	objsize 200,40
+	button "シャットダウン",*shutdown
+	button "再起動",*reboot
+	stop
+*reboot
+	exitflag=1
+	//ログ
+getdatestr date
+gettimestr time
+time_data=date+"/"+time+":"+gettime(7)
+notesel log
+noteload "combos.log"
+newlog=log+"\n"+time_data+"	再起動フラグが立ちました"
+notesel newlog
+notesave "combos.log"
+//ログ記入ここまで
+*shutdown
+	cls
+	if exitflag=1:mes "再起動しています":else:mes "シャットダウンしています"
+	//全アプリを強制終了
+if exitflag=1:exec "GUI再起動.bat",2
+	exec "Applications\\system\\全終了.bat",2
+//ログ
+getdatestr date
+gettimestr time
+time_data=date+"/"+time+":"+gettime(7)
+notesel log
+noteload "combos.log"
+newlog=log+"\n"+time_data+"　終了タスクが実行されました。"
+notesel newlog
+notesave "combos.log"
+//ログ記入ここまで
+//ログ
+getdatestr date
+gettimestr time
+time_data=date+"/"+time+":"+gettime(7)
+notesel log
+noteload "combos.log"
+if exitflag=1:newlog=log+"\n"+time_data+"　起動タスクが実行されました。"
+notesel newlog
+notesave "combos.log"
+//ログ記入ここまで
+
+	;exec dir_sys + "\\taskkill.exe /F /T /IM EXEの名前.exe"
+	wait 500
+	screen 0,1,1,2

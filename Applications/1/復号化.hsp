@@ -1,0 +1,46 @@
+//ログ
+#include "hsp3util.as"
+getdatestr date
+gettimestr time
+time_data=date+"/"+time+":"+gettime(7)
+notesel log
+noteload "../../combos.log"
+newlog=log+"\n"+time_data+"　暗号テキストエディタ(複号化)が起動されました。"
+notesel newlog
+notesave "../../combos.log"
+//ログ記入ここまで
+
+#include "hspinet.as"
+loadhensuu=""
+pass=""
+objsize 300,30
+mes "複号化する文字列の入力もしくは下からファイルの読み込みをしてください"
+mesbox loadhensuu,640,200,5,9999
+mes "パスワードを入力してください"
+input pass
+button gosub "ファイルの読み込み",*load
+button "GO",*go
+stop
+*go
+	cls
+;mes "元の文字列\n"+loadhensuu
+mes "パスワード\n"+pass
+rc4encode loadhensuu,pass,-1
+mes "複号化後の文字列\n"+loadhensuu
+button "保存",*save
+button "終了",*ne
+stop
+*load
+dialog "",16,""
+notesel loadhensuu
+noteload refstr
+loadname=refstr
+a="読み出しファイル:\n"+refstr
+mes a
+return
+*save
+notesel a
+dialog "",17,""
+notesave refstr
+*ne
+	end

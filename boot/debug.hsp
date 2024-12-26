@@ -1,0 +1,17 @@
+cls
+	color 100,100,100
+	boxf
+	color 255,0,0 
+	mes "	　この機能は開発者またはベータ版ユーザーのための機能です。\n	　	　一般ユーザーの使用は想定していません。"
+*log_viewer
+	notesel log
+	noteload "../combos.log"
+	color 0,200,255
+	mes "combos.log"
+	mesbox log,640,200,4,9999
+	button gosub"ログクリア",*clean
+stop
+*clean
+	dialog "全てのログを消去しますか?\nこれを実行すると空き容量を確保できますが、\n回復に役立つ情報が失われる可能性があります。",3
+	if stat=7:return
+	if stat=6:notesel tmp:notesave "../combos.log":dialog "消去しました。"

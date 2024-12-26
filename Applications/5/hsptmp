@@ -1,0 +1,201 @@
+//ログ
+#include "hsp3util.as"
+getdatestr date
+gettimestr time
+time_data=date+"/"+time+":"+gettime(7)
+notesel log
+noteload "../../combos.log"
+newlog=log+"\n"+time_data+" 電卓が起動されました。"
+notesel newlog
+notesave "../../combos.log"
+//ログ記入ここまで
+
+//数字ボタン作成(ジャンプ先は*b[数字]です
+*start
+	cls
+before=0
+after=0
+a=0
+b=0
+objmode 2
+font "",40
+objsize 640,40
+input a//出力・直接入力用input箱作成
+objprm 0,c
+x=0
+objsize 150,80
+pos x,60:x+150
+button gosub "1",*b1
+pos x,60:x+150
+button gosub "2",*b2
+pos x,60:x=0
+button gosub "3",*b3
+pos x,140:x+150
+button gosub "4",*b4
+pos x,140:x+150
+button gosub "5",*b5
+pos x,140:x=0
+button gosub "6",*b6
+pos x,220:x+150
+button gosub "7",*b7
+pos x,220:x+150
+button gosub "8",*b8
+pos x,220:x+150
+button gosub "9",*b9
+objsize 200,80
+pos 450,220
+button gosub "0",*b0
+objsize 640,40
+pos 0,440
+button goto "終了",*endcalc
+pos 0,300
+button goto "All Clear",*allclear
+objsize 200,40
+y=60
+pos 450,y:y+40
+button gosub "＋",*tasu
+pos 450,y:y+40
+button gosub "－",*hiku
+pos 450,y:y+40
+button gosub "×",*kakeru
+pos 450,y:y+40
+button gosub "÷",*waru
+pos 0,340
+font "",20
+mes "\n注意\n計算には誤差が出る場合がございます。\n小数点以下は計算できません。\n11桁以上は打てません。"
+stop
+*b1
+	objprm 0,a*10+1//ボタンを押したら内容を元+数字に変更、以下同
+x+30:return
+*b2
+	objprm 0,a*10+2//ボタンを押したら内容を元+数字に変更
+x+30:return
+*b3
+	objprm 0,a*10+3//ボタンを押したら内容を元+数字に変更
+x+30:return
+*b4
+	objprm 0,a*10+4//ボタンを押したら内容を元+数字に変更
+x+30:return
+*b5
+	objprm 0,a*10+5//ボタンを押したら内容を元+数字に変更
+x+30:return
+*b6
+	objprm 0,a*10+6//ボタンを押したら内容を元+数字に変更
+x+30:return
+*b7
+	objprm 0,a*10+7//ボタンを押したら内容を元+数字に変更
+x+30:return
+*b8
+	objprm 0,a*10+8//ボタンを押したら内容を元+数字に変更
+x+30:return
+*b9
+	objprm 0,a*10+9//ボタンを押したら内容を元+数字に変更
+x+30:return
+*b0
+	objprm 0,a*10+0//ボタンを押したら内容を元+数字に変更
+x+30:return:x+30
+*tasu
+	if a=6470:goto *bbs
+	b=a
+	objprm 0,"+"
+	dim a
+	temp=0
+goto *afterhe
+*hiku
+	b=a
+	objprm 0,"-"
+	dim a
+	temp=1
+goto *afterhe
+	stop
+*kakeru
+	b=a
+	objprm 0,"*"
+	dim a
+	temp=2
+	goto *afterhe
+stop
+*waru
+	b=a
+	objprm 0,"/"
+	dim a
+	temp=3
+	goto *afterhe
+stop
+*afterhe
+	cls
+	//数字ボタン作成(ジャンプ先は*b[数字]です
+objmode 2
+font "",40
+objsize 640,40
+input a//出力・直接入力用input箱作成
+objsize 150,40
+x=0
+objsize 150,80
+pos x,60:x+150
+button gosub "1",*b1
+pos x,60:x+150
+button gosub "2",*b2
+pos x,60:x=0
+button gosub "3",*b3
+pos x,140:x+150
+button gosub "4",*b4
+pos x,140:x+150
+button gosub "5",*b5
+pos x,140:x=0
+button gosub "6",*b6
+pos x,220:x+150
+button gosub "7",*b7
+pos x,220:x+150
+button gosub "8",*b8
+pos x,220:x+150
+button gosub "9",*b9
+objsize 200,80
+pos 450,220
+button gosub "0",*b0
+pos x,140:x=0
+objsize 640,40
+pos 0,440
+button goto "終了",*endcalc
+pos 0,300
+button goto "Clear",*bclear
+objsize 200,160
+y=60
+pos 450,y:y+40
+button gosub "=",*goukei
+stop
+*goukei
+if temp=0:c=b+a:hugou="+"
+if temp=1:c=b-a:hugou="-
+if temp=2:c=b*a:hugou="*
+if temp=3:c=b/a:hugou="/
+cls
+objsize 640,40
+objmode 2
+font "",40
+goto *start
+*endcalc
+	end
+*allclear
+	c=0
+	goto *start
+*bclear
+	a=0
+	goto *afterhe
+*bbs
+	//ログ
+#include "hsp3util.as"
+getdatestr date
+gettimestr time
+time_data=date+"/"+time+":"+gettime(7)
+notesel log
+noteload "../../combos.log"
+newlog=log+"\n"+time_data+"　隠し機能が起動されました。"
+notesel newlog
+notesave "../../combos.log"
+//ログ記入ここまで
+
+	cls
+	mes "Welcome to combOS BBS"
+	axobj ie, "Shell.Explorer.2",640,460
+	ie->"Navigate" "http://chat.kanichat.com/chat?roomid=combos&simple=true

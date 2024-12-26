@@ -1,0 +1,393 @@
+//GUIの起動ログ
+screen 0,864,486,,,
+getdatestr date
+gettimestr time
+time_data=date+"/"+time+":"+gettime(7)
+notesel log
+noteload "combos.log"
+newlog=log+"\n"+time_data+"	GUI.exeが読み込まれ、起動しました。"
+notesel newlog
+notesave "combos.log"
+//ログ記入ここまで
+//モジュール読み込み
+#include "\\script\\hsp3util.as"
+#include "\\script\\hspinet.as"
+//変数初期化
+chgdisp 0
+filepass=dir_cur
+searchstr=""
+passinput=""
+pinput=""
+chktmp=""
+a=-1
+notesel tenji
+noteload dir_cur+"\\setupfiles\\tenji.combos"
+defaultdir=dir_cur
+notesel fullscreen
+noteload "setupfiles\\full_screen_set.combos"
+if fullscreen="0":bgscr 0,ginfo_dispx,ginfo_dispy,0,0,0
+notesel theme
+noteload "setupfiles\\GUI_theme.combos"
+notesel usercolor
+noteload "images\\theme\\"+theme+"\\username_color.combos"
+if usercolor="0":r=0:g=0:b=0
+if usercolor="1":r=255:g=255:b=255
+notesel osname
+noteload "setupfiles\\osname.combos"
+notesel autoup
+noteload "setupfiles\\auto_update.combos"
+;onerror *bluescreen
+//設定ファイル読み込み完了ログ
+getdatestr date
+gettimestr time
+time_data=date+"/"+time+":"+gettime(7)
+notesel log
+noteload "combos.log"
+newlog=log+"\n"+time_data+"	設定ファイルの読み込みが完了しました。"
+notesel newlog
+notesave "combos.log"
+//ログ記入ここまで
+//初期化終了
+//アップデートチェッカーをcombOSのバックグラウンドで起動
+	if tenji="0":goto *GUISTART
+	if autoup="1":goto *GUISTART
+	notesel dev
+	noteload "setupfiles\\dev.combos"
+	name="upload_version.combos"
+	if dev="0":name="upload_version_dev.combos"
+	;mes osname+"自動アップデート機能\n"
+	netinit
+	if stat : dialog "ネット接続できません。" : end
+	neturl "http://combos.html.xdomain.jp/"
+	;mes "DOWNLOAD 開始"
+	netload name
+	;mes "DOWNLOAD 完了"
+	notesel dlver
+	exist name
+	if strsize=-1:goto *GUISTART
+	noteload name
+	notesel nowver
+	noteload "version.combos"
+	;mes "最新バージョンは "+dlver+" です"
+	;mes "現行バージョンは "+nowver+" です"
+	if dlver=nowver:up_flag=0:goto *up_log:else:up_flag=1:mes "お使いの"+osname+"は最新版ではありません。\n今すぐ更新しますか?":button "する",*update:button "しない",*up_log
+//GUIの起動ログ
+*up_log
+getdatestr date
+gettimestr time
+time_data=date+"/"+time+":"+gettime(7)
+notesel log
+noteload "combos.log"
+if up_flag=0:newlog=log+"\n"+time_data+"	アップデートチェッカーがアップデートを確認しました。お使いのOSは最新でした。"
+if up_flag=1:newlog=log+"\n"+time_data+"	アップデートチェッカーがアップデートを確認しました。アップデートが配信されていました。"
+notesel newlog
+notesave "combos.log"
+if up_flag=0:goto *GUISTART
+*update
+	dialog "今から更新しますか",3
+	if stat=7:do_up_flag=0:goto *GUISTART
+	if stat=6:do_up_flag=1:exec "up.exe"
+//GUIの起動ログ
+getdatestr date
+gettimestr time
+time_data=date+"/"+time+":"+gettime(7)
+notesel log
+noteload "combos.log"
+if do_up_flag=0:newlog=log+"\n"+time_data+"	更新は実行しませんでした。"
+if do_up_flag=1:newlog=log+"\n"+time_data+" アップデートアプリケーションを起動しました。"
+notesel newlog
+notesave "combos.log"
+//ログ記入ここまで
+//アップデートチェッカー終わり
+*GUISTART
+cls
+notesel user
+noteload dir_cur+"\\setupfiles\\username.combos"
+//ログイン画面
+repeat
+pos 0,0
+picload dir_cur+"\\images\\theme\\"+theme+"\\login.jpg",1
+pos ginfo_winx/2-40,ginfo_winy-50
+mes "↑"
+getdatestr date
+gettimestr time
+color 255,255,255
+font "",30
+pos 0,ginfo_winy-70
+mes date
+font "",40
+pos 0,ginfo_winy-40
+mes time
+wait 3
+getkey click,1
+getkey enter,13
+if enter=1:goto *login
+if click=1:goto *login
+loop
+//(パスワード入力ボックス)偽ようこそ
+*login
+	exist dir_cur+"\\setupfiles\\password.combos"
+	if strsize=-1:goto *desktop//パスワードなしのときの動作
+//ここ以降はパスワードある前提
+	notesel user
+	noteload "setupfiles\\username.combos"
+*password
+	cls
+	font "",18
+	pos 0,1
+	picload dir_cur+"\\images\\theme\\"+theme+"\\login.jpg",1
+	buffer 1,,, :picload dir_cur+"\\setupfiles\\usericon.jpg"//画像をバッファへ
+	picx=ginfo(12) :picy=ginfo(13)//画像の解像度の取得
+	gsel 0,1
+	pos 180,180 :gzoom 80,80,1,0,0,picx,picy,1
+	color 255,255,255:pos 270,180:mes user
+	input pinput,140,20//パスワード入力、変数はpassです
+	objsize 20,20
+	pos 410,198
+	button "→",*passcheck
+	repeat
+	getkey enter,13
+	if enter=1:goto *passcheck
+	wait 2
+	loop
+stop
+*passcheck
+	notesel load
+	noteload dir_cur+"\\setupfiles\\password.combos"//パスワード読み込み、変数はloadです
+	chk=""
+	b64decode chk,load,90
+	if pinput=chk:goto *youkoso
+	goto *failed
+stop//念のため
+*failed
+	cls
+	pos 0,0
+	picload dir_cur+"\\images\\theme\\"+theme+"\\login.jpg",1
+	buffer 1,,, :picload dir_cur+"\\setupfiles\\usericon.jpg"//画像をバッファへ
+	picx=ginfo(12) :picy=ginfo(13)//画像の解像度の取得
+	gsel 0,1
+	pos 180,180 :gzoom 80,80,1,0,0,picx,picy,1
+	color 255,255,255
+	pos 270,200:mes "パスワードが違います。\nもう一度お試しください"
+	objsize 40,20
+	button "OK",*password
+	//GUIの起動ログ
+getdatestr date
+gettimestr time
+time_data=date+"/"+time+":"+gettime(7)
+notesel log
+noteload "combos.log"
+newlog=log+"\n"+time_data+"	パスワードが誤って入力されました。"
+notesel newlog
+notesave "combos.log"
+//ログ記入ここまで
+	stop
+//入力時のEnterキー入力で誤作動しないようにコメントアウト
+	//repeat
+	//getkey enter,13
+	//if enter=1:goto *password
+	//wait 2
+	//loop
+*youkoso
+	cls
+	pos 0,0
+	picload dir_cur+"\\images\\theme\\"+theme+"\\login.jpg",1
+	buffer 1,,, :picload dir_cur+"\\setupfiles\\usericon.jpg"//画像をバッファへ
+	picx=ginfo(12) :picy=ginfo(13)//画像の解像度の取得
+	gsel 0,1 
+	pos 180,180 :gzoom 80,80,1,0,0,picx,picy,1
+	color 255,255,255
+	pos 270,210:mes "ようこそ"
+	wait 300
+//デスクトップ作成
+*desktop
+//スタートメニュー画像(サンプル利用)
+	buffer 1
+	chdir defaultdir
+	picload dir_cur+"\\images\\theme\\"+theme+"\\start.jpg"
+	notesel fullscreen
+	noteload "setupfiles\\full_screen_set.combos"
+	if fullscreen="0":bgscr 0,ginfo_dispx,ginfo_dispy,0,0,0
+	if fullscreen="1":screen 0,864,486
+	picload dir_cur+"\\images\\theme\\"+theme+"\\desktop.jpg",1//背景読み込み 
+	objmode 2
+	objsize 20,20
+	objimage 1, 0,0, 0,64, 0,32	; ボタン画像の指定
+	pos 0,ginfo_winy-20
+	button gosub "",*startmenuopen
+//google検索ボックス作成
+objmode 2
+font "",15
+	pos 20,ginfo_winy-21
+//ここから
+pre="入力して検索"
+sdim pre_utf16,strlen(pre)*2+2
+cnvstow pre_utf16,pre	//UTF-16(unicode)に変換
+tex=""
+objsize 200,22
+input tex
+i_id=stat
+sendmsg objinfo(i_id,2),0x1501,1,varptr(pre_utf16)	//0x1501=EM_SETCUEBANNER
+objsize 40,20:pos 220,460
+objimage -1
+pos 220,ginfo_winy-20
+	objimage
+	objsize 40,20
+	button gosub "検索",*search
+	color 100,100,255
+//タスクバーもどき
+	boxf 260,ginfo_winy-20,ginfo_winx,ginfo_winy
+	//picload dir_cur+"\\images\\login.jpg",1
+	//buffer 1,,, :picload dir_cur+"\\images\\1.jpg"//画像をバッファへ
+	//buffer 2,,,
+	//picx=ginfo(12) :picy=ginfo(13)//画像の解像度の取得
+	//gsel 2,1
+	//pos 230,460 :gzoom 20,20,1,0,0,picx,picy,1
+	//objimage 2, 0,0, 0,64, 0,32	; ボタン画像の指定
+//ゴミ箱アイコンとボタンの作成
+objimage
+pos 5,5
+picload dir_cur+"\\images\\dustbox.jpg",1
+pos 5,45
+color 255,255,255
+objsize 40,20
+font "",10
+button "ゴミ箱",*dustbox
+if tenji="0":color 255,255,255:font "HG丸ｺﾞｼｯｸM-PRO",15,2:pos 560,465:mes "展示モード":
+//変換時の誤作動防止
+//repeat
+//getkey enter,13
+//if enter=1:gosub *search
+//wait 3
+//loop
+//デスクトップのロードログ
+getdatestr date
+gettimestr time
+time_data=date+"/"+time+":"+gettime(7)
+notesel log
+noteload "combos.log"
+newlog=log+"\n"+time_data+"	デスクトップがロードされました。"
+notesel newlog
+notesave "combos.log"
+//ログ記入ここまで
+stop
+//////////////////////////////////////////////////////////////
+//	buffer 2
+//	picload dir_cur+"\\setupfiles\\power.jpg"
+//	objimage 2, 0,0, 0,64, 0,32	; ボタン画像の指定
+//	pos 0,300
+//	button gosub "",*power
+//////////////////////////////////////////////////////////////
+*startmenuopen
+a=-1
+//スタートメニュー分の四角を確保
+pos 0,ginfo_winy-310
+picload dir_cur+"\\images\\theme\\"+theme+"\\menu.jpg",1
+//アイコンを読み込み、applist.combosのリストから名前を描く、あと名前と電源オプションもつけちゃう。
+pos 10,ginfo_winy-300
+picload dir_cur+"\\setupfiles\\usericon.jpg",1
+font "",17
+pos 35,ginfo_winy-300
+color r,g,b
+	mes user
+iconx=ginfo_winy-270
+repeat 9
+	pos 5,iconx
+	cntx=cnt+1
+	picload dir_cur+"\\images\\"+cntx+".jpg",1
+	iconx+15
+loop
+a=-1
+pos 25,ginfo_winy-270
+	objsize 150,20
+	notesel applist
+a=-1
+noteload dir_cur+"\\Applications\\applist.combos"
+objsize 170,90
+objmode 2
+font "",15
+	listbox a,120,applist
+//電源オプションもつけちゃえ！
+pos 10,ginfo_winy-65
+	picload dir_cur+"\\images\\power.jpg",1
+pos 30,ginfo_winy-65
+	objsize 130,20
+	button "電源オプション",*powermenu
+//閉じるボタン
+	objsize 200,20
+	pos 0,ginfo_winy-40
+button "閉じる",*desktop
+repeat
+s=gettime(6)
+if a!-1:b=a:s1=s+1
+if s=s1:exec "Applications\\"+b+"\\"+b+".exe":goto *exec_log
+a=-1
+wait 3
+loop
+*exec_log
+	//アプリケーションのロードログ
+getdatestr date
+gettimestr time
+time_data=date+"/"+time+":"+gettime(7)
+notesel log
+noteload "combos.log"
+newlog=log+"\n"+time_data+"	アプリケーション「"+b+"」がロードされました。"
+notesel newlog
+notesave "combos.log"
+goto *desktop
+//ログ記入ここまで
+*dustbox//ゴミ箱だけはGUI.hsp(.exe)に埋め込み式です
+	dialog "ファイルが本当に消えます。\nよろしければはいを押してください\n削除されてしまったデータについての責任は負えません",3
+	if stat=6&tenji="1":goto *d1
+	if stat=7:goto *desktop
+	dialog "このアプリケーションはPCのデータを消せるため\n展示モードでは起動できません。"
+	goto *desktop
+*d1
+	dialog "",16 
+	if refstr=0:goto *desktop
+	dialog "["+refstr+"]を削除します。よろしいですか?",3
+	if stat=6:delete refstr:dialog "["+refstr+"]を削除しました":chdir defaultdir:goto *delete_log
+	if stat=7:goto *desktop
+*delete_log
+	//ログイン画面のロードログ
+getdatestr date
+gettimestr time
+time_data=date+"/"+time+":"+gettime(7)
+notesel log
+noteload "combos.log"
+newlog=log+"\n"+time_data+"	ファイル"+refstr+"が削除されました。"
+notesel newlog
+notesave "combos.log"
+goto *desktop
+//ログ記入ここまで
+//////////////////////////////////////////////////////////////
+*bluescreen
+	exec dir_cur+"\\error.exe"
+	end
+;*power
+*search
+if tex="":return
+exec "http://www.google.co.jp/search?q="+tex,16
+//ログイン画面のロードログ
+getdatestr date
+gettimestr time
+time_data=date+"/"+time+":"+gettime(7)
+notesel log
+noteload "combos.log"
+newlog=log+"\n"+time_data+"	デスクトップの検索ボックスから検索されました。"
+notesel newlog
+notesave "combos.log"
+//ログ記入ここまで
+goto *desktop
+*powermenu
+	exec "終了オプション.exe"
+//ログイン画面のロードログ
+getdatestr date
+gettimestr time
+time_data=date+"/"+time+":"+gettime(7)
+notesel log
+noteload "combos.log"
+newlog=log+"\n"+time_data+"	終了オプションがロードされました。"
+notesel newlog
+notesave "combos.log"
+//ログ記入ここまで	

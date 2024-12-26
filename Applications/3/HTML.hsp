@@ -1,0 +1,63 @@
+//ログ
+#include "hsp3util.as"
+getdatestr date
+gettimestr time
+time_data=date+"/"+time+":"+gettime(7)
+notesel log
+noteload "../../combos.log"
+newlog=log+"\n"+time_data+"　HTMLエディタが起動されました。"
+notesel newlog
+notesave "../../combos.log"
+//ログ記入ここまで
+
+*hensyu
+cls
+notesel gyoku
+pos 0,20
+mesbox gyoku,640,370,-1
+objsize 640,30
+button "実行",*dt
+button "前回保存したものの読み込み",*loadhtmlp
+button "戻る",*loginconplete
+pos 0,0
+mes "URLはhttp(ないしhttps)から入れてください
+stop
+*dt
+	cls
+	objsize 100,20
+	button "編集に戻る",*hensyu
+pos 100,0
+	button "戻る",*back
+pos 200,0
+	button "進む",*forward
+pos 300,0
+    button "再読み込み",*refresh
+pos 400,0
+    button "保存",*save
+pos 500,0
+	button "終了",*endhtml
+    pos 0,20
+	axobj ie, "Shell.Explorer.2", ginfo_winx, ginfo_winy
+	htmls=gyoku
+	ie -> "Navigate" "about:blank"
+	doc = ie("Document")
+	doc -> "write" htmls
+	stop
+*back
+	ie->"GoBack"
+	goto *dt
+*forward
+	ie->"GoForward"
+	goto *dt
+*refresh
+	ie->"Refresh"
+	goto *dt
+*save
+	dialog "html",17,"htmlファイル"
+	if stat=0:dialog "保存ファイル名選択の段階でエラーが発生しました。\nキャンセルボタンを押した場合もこの画面が出る可能性があります":goto *hensyu
+	if stat=1:notesave refstr+".html
+	dialog "セーブしました"
+*endhtml
+*loginconplete
+	end
+*loadhtmlp

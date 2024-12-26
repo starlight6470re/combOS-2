@@ -1,0 +1,18 @@
+celload "boot\\theme\\0\\background.jpg",2
+元画像幅=ginfo(12)
+元画像高=ginfo(13)
+gmode 0,元画像幅,元画像高
+
+画像中心X=640
+画像中心Y=340
+拡大率=1.0
+回転角度=0
+gsel 0
+repeat
+	redraw 0
+	color:boxf
+	pos 画像中心X,画像中心Y
+	grotate 2,0,0,deg2rad(回転角度),拡大率*元画像幅,拡大率*元画像高
+	redraw 1
+	await 10
+loop

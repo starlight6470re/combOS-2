@@ -1,0 +1,27 @@
+#include "hsp3util.as"
+//ログ
+getdatestr date
+gettimestr time
+time_data=date+"/"+time+":"+gettime(7)
+notesel log
+noteload "combos.log"
+newlog=log+"\n"+time_data+"	エラーが発生しました。"
+notesel newlog
+notesave "combos.log"
+//ログ記入ここまで
+color 100,100,255
+boxf
+font "メイリオ",20
+color 255,255,255
+pos 40,20
+mes "問題が発生したためcombOSを終了しました。\n最近の更新・改造の影響が考えられます。\n\n"
+font "メイリオ",15
+mes "発生場所・原因がわかっている場合は修正してください。\n\n原因不明のエラーが繰り返される場合未解決のバグの可能性があります。\n開発にご協力いただけるなら、ご連絡ください"
+objsize 640,20
+pos 0,460
+button "連絡ツールを起動する",*kidou
+stop
+*kidou
+	dialog "起動ログをコピーしてくださると原因究明に役立つ可能性があります。\nまた、返信先を記入していただくと、\n問題解決時にご返信させていただきます。"
+	exec "http://m.kuku.lu/f.php?h=5d4dc7cd12307292b3adb7deff3b9f81",16
+	
