@@ -1,0 +1,24 @@
+font "",15
+boxf 
+color 255,255,255
+mes "file check           ",1
+color 255,255,0
+mes "skip"
+pos 0,
+color 255,255,255
+mes "booting...           ",1
+color 0,255,0
+notesel bootfile
+noteload dir_cur+"\\bootfile.combos"
+noteget bootfile,0
+notesel tenji
+noteload bootfile+"\\setupfiles\\tenji.combos"
+wait 100
+mes "combOS GUI Found at \n"+bootfile+"\\GUI.exe"
+wait 100
+if tenji="0":mes "Launch in exhibition mode" 
+wait 100
+mes "exec"
+wait 100
+exec bootfile+"\\GUI.exe"
+end

@@ -1,0 +1,9 @@
+buffer 1,,, :picload dir_cur+"\\images\\dustbox.jpg"//画像をバッファへ
+picx=ginfo(12) :picy=ginfo(13)//画像の解像度の取得
+
+dispx=ginfo (20) : dispy=ginfo (21) ;解像度所得
+bgscr 0,dispx,dispy,0,0,0,, :gsel 0,2 :color 0,0,0 :boxf
+
+pos 0,0 :gzoom dispx,dispy,1,0,0,picx,picy,1
+
+stop

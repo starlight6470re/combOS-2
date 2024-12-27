@@ -1,0 +1,14 @@
+動作確認環境は以下の通りですが、すべてのPCで動作する保証はございません。
+
+1.Acer Aspire x3900(改造済み)
+CPU: 		Intel Core i3 530 2.93GHz
+RAM: 		DDR3-1333 (PC-10600) 1GB*2+2GB*1=4GB
+SSD: 		Samsung 860 QVO 1TB
+グラフィック:	HD graphics Integrated Intel GMA
+OS:             	Windows10 Pro
+2.Dell Inspiron 11 3179
+CPU:		Intel Core m3 7Y30 1.00GHz
+RAM:		DDR3-1600 オンボード 4GB
+SSD:		SK hynix SC308 SATA 128GB
+グラフィック:	Intel HDグラフィックス 615
+
