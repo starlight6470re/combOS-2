@@ -1,0 +1,70 @@
+#include "script\\hspinet.as"
+#include "script\\hspext.as"
+onexit gosub *delete_temp
+exist "reset_flag.combos"
+if strsize!-1:goto *reset
+exist "upload_version.combos"
+if strsize!-1:goto *skip
+notesel dlver
+noteload "upload_version.combos"
+*skip
+exist "combOS_"+dlver+".exe"
+if strsize!-1:dialog "ダウンロード済み更新データが検出されました。\ncombOS_"+dlver+".exeを使用しますか?",2:if stat=6:goto *go:else:goto *update
+*update
+mes "誤作動を招きますので事前にすべてのプログラムを終了し、\nアップデート中はPCを操作しないことを強くお勧めします"
+dialog "開始するにははいを押してください",2
+if stat=7:end
+//BSDライセンス適応
+	netinit
+	if stat : dialog "ネット接続できません。" : end
+	notesel URL
+	noteload "setupfiles\\repository.combos"
+	neturl URL
+	notesel dlver
+	noteload "upload_version_temp.combos"
+	mes "DOWNLOAD 開始"
+	netload "combOS_"+dlver+".exe"
+	dialog "ダウンロード完了。今すぐ適応しますか",2
+	if stat=6:goto *go
+	if stat=7:dialog "このアプリケーションを終了します":end
+*go
+	a="combos_"+dlver+".exe"
+	if reset_local=1:a="recovery.exe"
+	exec a
+	mes "ウィンドウが出たり消えたりするのが止まったら「Enterキー」を押してください"
+repeat
+	aplkey 13
+	wait 3
+	getkey a,13
+	if a=1:dialog "完了しました":goto *finish
+loop
+*reset
+	notesel recovery_ver
+	noteload "recovery_version.combos"
+	mes "この本体に保存されているバージョンで復元します。\nこの場合、バージョン"+recovery_ver+"となります。"
+	mes "インターネットに接続して最新版で初期化することもできます。どうしますか?"
+	objsize 640,40
+	objmode 2:font "",30
+	button "本体に保存されたバージョンで初期化する",*local_reset
+	button "インターネットにある最新版で初期化する",*update
+stop
+*local_reset
+	reset_local=1
+	goto *go
+*finish
+	mes "一時ファイルを削除しますか?"
+	button "一時ファイルを保持する",*goout
+	button "一時ファイルを削除する",*delete_temp
+	stop
+*delete_temp
+	exist "upload_version_temp.combos"
+	if strsize!-1:flag1=1
+	exist "combOS_"+dlver+".exe"
+	if strsize!-1:flag2=1
+	exist "reset_flag.combos"
+	if strsize!-1:flag3=1
+	if flag1=1:delete "upload_version_temp.combos"
+	if flag2=1:delete "combOS_"+dlver+".exe"
+	if flag3=1:delete "reset_flag.combos"
+*goout
+	end

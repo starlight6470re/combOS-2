@@ -1,0 +1,274 @@
+#include "\\script\\hsp3util.as"
+#include "\\script\\hspinet.as"
+//変数初期化
+chgdisp 0
+filepass=dir_cur
+searchstr=""
+passinput=""
+pinput=""
+chktmp=""
+a=-1
+notesel fullscreen
+noteload "setupfiles\\full_screen_set.combos"
+if fullscreen="0":chgdisp 1,640,480:bgscr 0,640,480,0,0,0
+notesel theme
+noteload "setupfiles\\GUI_theme.combos"
+notesel usercolor
+noteload "images\\theme\\"+theme+"\\username_color.combos"
+if usercolor="0":r=0:g=0:b=0
+if usercolor="1":r=255:g=255:b=255
+notesel osname
+noteload "setupfiles\\osname.combos"
+notesel autoup
+noteload "setupfiles\\auto_update.combos"
+onerror *bluescreen
+//初期化終了
+//アップデートチェッカー起動
+	if autoup="1":goto *GUISTART
+	mes osname+"自動アップデート機能\n"
+	netinit
+	if stat : dialog "ネット接続できません。" : end
+	neturl "http://combos.html.xdomain.jp/"
+	mes "DOWNLOAD 開始"
+	netload "upload_version.combos"
+	mes "DOWNLOAD 完了"
+	notesel dlver
+	noteload "upload_version.combos"
+	notesel nowver
+	noteload "version.combos"
+	mes "最新バージョンは "+dlver+" です"
+	mes "現行バージョンは "+nowver+" です"
+	if dlver=nowver:mes "お使いの"+osname+"は最新です":wait 300:goto *GUISTART:else:mes "お使いの"+osname+"は最新版ではありません。\n今すぐ更新しますか?":button "する",*update:button "しない",*GUISTART
+*update
+	dialog "今から更新しますか",3
+	if stat=7:goto *GUISTART
+	if stat=6:exec "up.exe"
+//アップデートチェッカー終わり
+*GUISTART
+cls
+notesel user
+noteload dir_cur+"\\setupfiles\\username.combos"
+//ログイン画面
+repeat
+pos 0,0
+picload dir_cur+"\\images\\theme\\"+theme+"\\login.jpg",1
+pos 290,430
+mes "↑"
+getdatestr date
+gettimestr time
+color 255,255,255
+font "",30
+pos 0,410
+mes date
+font "",40
+pos 0,440
+mes time
+wait 3
+getkey click,1
+getkey enter,13
+if enter=1:goto *login
+if click=1:goto *login
+loop
+//(パスワード入力ボックス)偽ようこそ
+*login
+	exist dir_cur+"\\setupfiles\\password.combos"
+	if strsize=-1:goto *desktop//パスワードなしのときの動作
+//ここ以降はパスワードある前提
+	notesel user
+	noteload "setupfiles\\username.combos"
+*password
+	cls
+	font "",18
+	pos 0,1
+	picload dir_cur+"\\images\\theme\\"+theme+"\\login.jpg",1
+	buffer 1,,, :picload dir_cur+"\\setupfiles\\usericon.jpg"//画像をバッファへ
+	picx=ginfo(12) :picy=ginfo(13)//画像の解像度の取得
+	gsel 0,1
+	pos 180,180 :gzoom 80,80,1,0,0,picx,picy,1
+	color 255,255,255:pos 270,180:mes user
+	input pinput,140,20//パスワード入力、変数はpassです
+	objsize 20,20
+	pos 410,198
+	button "→",*passcheck
+	repeat
+	getkey enter,13
+	if enter=1:goto *passcheck
+	wait 2
+	loop
+stop
+*passcheck
+	notesel load
+	noteload dir_cur+"\\setupfiles\\password.combos"//パスワード読み込み、変数はloadです
+	chk=""
+	b64decode chk,load,90
+	if pinput=chk:goto *youkoso
+	goto *failed
+stop//念のため
+*failed
+	cls
+	pos 0,0
+	picload dir_cur+"\\images\\theme\\"+theme+"\\login.jpg",1
+	buffer 1,,, :picload dir_cur+"\\setupfiles\\usericon.jpg"//画像をバッファへ
+	picx=ginfo(12) :picy=ginfo(13)//画像の解像度の取得
+	gsel 0,1
+	pos 180,180 :gzoom 80,80,1,0,0,picx,picy,1
+	color 255,255,255
+	pos 270,200:mes "パスワードが違います。\nもう一度お試しください"
+	objsize 40,20
+	button "OK",*password
+	stop
+//入力時のEnterキー入力で誤作動しないようにコメントアウト
+	//repeat
+	//getkey enter,13
+	//if enter=1:goto *password
+	//wait 2
+	//loop
+*youkoso
+	cls
+	pos 0,0
+	picload dir_cur+"\\images\\theme\\"+theme+"\\login.jpg",1
+	buffer 1,,, :picload dir_cur+"\\setupfiles\\usericon.jpg"//画像をバッファへ
+	picx=ginfo(12) :picy=ginfo(13)//画像の解像度の取得
+	gsel 0,1 
+	pos 180,180 :gzoom 80,80,1,0,0,picx,picy,1
+	color 255,255,255
+	pos 270,210:mes "ようこそ"
+	wait 300
+//デスクトップ作成
+*desktop
+//スタートメニュー画像(サンプル利用)
+	buffer 1
+	picload dir_cur+"\\images\\theme\\"+theme+"\\start.jpg"
+	notesel fullscreen
+	noteload "setupfiles\\full_screen_set.combos"
+	if fullscreen="0":chgdisp 1,640,480:bgscr 0,640,480,0,0,0
+	if fullscreen="1":screen 0,640,480
+	picload dir_cur+"\\images\\theme\\"+theme+"\\desktop.jpg",1//背景読み込み 
+	objmode 2
+	objsize 20,20
+	objimage 1, 0,0, 0,64, 0,32	; ボタン画像の指定
+	pos 0,460
+	button gosub "",*startmenuopen
+//google検索ボックス作成
+objmode 2
+font "",15
+	pos 20,459
+//ここから
+pre="入力して検索"
+sdim pre_utf16,strlen(pre)*2+2
+cnvstow pre_utf16,pre	//UTF-16(unicode)に変換
+tex=""
+objsize 200,22
+input tex
+i_id=stat
+sendmsg objinfo(i_id,2),0x1501,1,varptr(pre_utf16)	//0x1501=EM_SETCUEBANNER
+objsize 40,20:pos 220,460
+objimage -1
+pos 220,460
+	objimage
+	objsize 40,20
+	button gosub "検索",*search
+	color 100,100,255
+//タスクバーもどき
+	boxf 200,460,640,480
+	//picload dir_cur+"\\images\\login.jpg",1
+	//buffer 1,,, :picload dir_cur+"\\images\\1.jpg"//画像をバッファへ
+	//buffer 2,,,
+	//picx=ginfo(12) :picy=ginfo(13)//画像の解像度の取得
+	//gsel 2,1
+	//pos 230,460 :gzoom 20,20,1,0,0,picx,picy,1
+	//objimage 2, 0,0, 0,64, 0,32	; ボタン画像の指定
+//ゴミ箱アイコンとボタンの作成
+objimage
+pos 5,5
+picload dir_cur+"\\images\\dustbox.jpg",1
+pos 5,45
+color 255,255,255
+objsize 40,20
+font "",10
+button "ゴミ箱",*dustbox
+notesel tenji
+noteload dir_cur+"\\setupfiles\\tenji.combos"
+if tenji="0":color 255,255,255:font "HG丸ｺﾞｼｯｸM-PRO",15,2:pos 560,465:mes "展示モード"
+//変換時の誤作動防止
+//repeat
+//getkey enter,13
+//if enter=1:gosub *search
+//wait 3
+//loop
+stop
+//////////////////////////////////////////////////////////////
+//	buffer 2
+//	picload dir_cur+"\\setupfiles\\power.jpg"
+//	objimage 2, 0,0, 0,64, 0,32	; ボタン画像の指定
+//	pos 0,300
+//	button gosub "",*power
+//////////////////////////////////////////////////////////////
+*startmenuopen
+a=-1
+//スタートメニュー分の四角を確保
+pos 0,150
+picload dir_cur+"\\images\\theme\\"+theme+"\\menu.jpg",1
+//アイコンを読み込み、applist.combosのリストから名前を描く、あと名前と電源オプションもつけちゃう。
+pos 10,180
+picload dir_cur+"\\setupfiles\\usericon.jpg",1
+font "",17
+pos 35,180
+color r,g,b
+	mes user
+iconx=210
+repeat 9
+	pos 5,iconx
+	cntx=cnt+1
+	picload dir_cur+"\\images\\"+cntx+".jpg",1
+	iconx+15
+loop
+a=-1
+pos 25,210
+	objsize 150,20
+	notesel applist
+a=-1
+noteload dir_cur+"\\Applications\\applist.combos"
+objsize 170,90
+objmode 2
+font "",15
+	listbox a,120,applist
+//電源オプションもつけちゃえ！
+pos 10,415
+	picload dir_cur+"\\images\\power.jpg",1
+pos 30,415
+	objsize 130,20
+	button "電源オプション",*powermenu
+//閉じるボタン
+	objsize 200,20
+	pos 0,440
+button "閉じる",*desktop
+repeat
+s=gettime(6)
+if a!-1:b=a:s1=s+1
+if s=s1:exec "Applications\\"+b+"\\"+b+".exe":goto *desktop
+a=-1
+wait 3
+loop
+*dustbox//ゴミ箱だけはGUI.hsp(.exe)に埋め込み式です
+	dialog "ファイルが本当に消えます。\nよろしければはいを押してください\n削除されてしまったデータについての責任は負えません",3
+	if stat=6:goto *d1
+	if stat=7:goto *desktop
+*d1
+	dialog "",16 
+	if refstr=0:goto *desktop
+	dialog "["+refstr+"]を削除します。よろしいですか?",3
+	if stat=6:delete refstr:dialog "["+refstr+"]を削除しました":goto *desktop
+	if stat=7:goto *desktop
+//////////////////////////////////////////////////////////////
+*bluescreen
+	exec dir_cur+"\\error.exe"
+	end
+;*power
+*search
+if tex="":return
+exec "http://www.google.co.jp/search?q="+tex,16
+goto *desktop
+*powermenu
+	exec "終了オプション.exe"
+	

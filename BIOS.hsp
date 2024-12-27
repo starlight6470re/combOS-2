@@ -1,0 +1,156 @@
+*poweron
+cls
+notesel fullscreen
+noteload "setupfiles\\full_screen_set.combos"
+if fullscreen="0":chgdisp 1,640,480:bgscr 0,640,480,0,0,0
+notesel themenumber
+noteload dir_cur+"\\boot\\theme.combos"
+notesel circleflag
+noteload dir_cur+"\\boot\\theme\\"+themenumber+"\\circle.combos"
+notesel tenji
+noteload dir_cur+"\\setupfiles\\tenji.combos"
+notesel osname
+noteload dir_cur+"\\setupfiles\\osname.combos"
+notesel osversion
+noteload dir_cur+"\\version.combos"
+if tenji="0":goto *tenjigo
+//配布用
+notesel licence
+noteload dir_cur+"\\Document\\LICENCE.txt"
+font "",11
+mes licence
+mes "\nこのライセンス条項はDocument内LICENCE.txtよりいつでも確認することができます。"
+wait 100
+cls
+notesel licence2
+noteload dir_cur+"\\Document\\著作権表示.txt"
+font "",12
+mes licence2
+mes "\nこのライセンス条項はDocument内著作権表示.txtよりいつでも確認することができます。"
+wait 100
+goto *splash
+//
+*tenjigo
+tenjiflag=1
+*splash
+picload dir_cur+"\\boot\\theme\\"+themenumber+"\\background.jpg
+color 255,255,255
+font "HG丸ｺﾞｼｯｸM-PRO",70
+pos 160,140
+mes osname+" "
+font "HG丸ｺﾞｼｯｸM-PRO",15
+pos 380,210
+mes "Version."+osversion
+pos 0,465
+//ここからYahoo知恵袋
+if circleflag="0":goto *ait
+r1=20.0
+r2=4
+x0=300
+y0=370
+dim active,5
+dim th,5
+ncount=0
+repeat 700
+getkey chkbios,66
+if chkbios=1:goto *bios
+redraw 0
+color 30,30,30
+boxf 275,345,325,395
+if ncount<100{
+if cnt2/20 <= 5 : active(cnt2/20)=1
+live=0
+repeat 5
+if active(cnt)=0 : continue
+live=live+1 ; 丸を描いた回数をカウントする
+if th(cnt)<700 {
+c=cos(deg2rad(th(cnt)))
+y=r1*c+y0
+x=-r1*sin( deg2rad(th(cnt)) )+x0
+color 200,200,200
+circle x-r2,y-r2,x+r2,y+r2,1
+th(cnt)=th(cnt)+(c+2)*(c+2)
+} else {
+active(cnt)=0
+th(cnt)=0
+}
+loop
+if live=0 : ncount=ncount+1 ;丸が全部消えてからのループ回数=時間をカウント
+cnt2++
+} else {
+;次の回を開始
+cnt2=0
+ncount=0
+}
+redraw 1
+await 10
+loop
+goto *writepass
+//ここまで
+*ait
+repeat 100
+mes "Press B to Enter BIOS Setup "
+if tenjiflag=1:pos 560,465:mes "展示モード"
+wait 3
+getkey chkbios,66
+if chkbios=1:goto *bios
+loop
+*writepass
+notesel pass
+pass=dir_cur
+notesave dir_cur+"\\boot\\bootfile.combos"//起動用に絶対パス保存
+notesave dir_cur+"\\Applications\\4\\cmdpass.combos"//コマンドラインインタプリタ用に絶対パス保存
+notesave dir_cur+"\\Applications\\6\\pass.combos"//インストーラ用に絶対パス保存
+*boot
+color 255,255,255
+if tenjiflag=1:pos 560,465:font "HG丸ｺﾞｼｯｸM-PRO",15,2:mes "展示モード"
+wait 200
+*boot_exec
+notesel bootset
+noteload dir_cur+"\\boot\\setup.combos"
+if bootset="1":exec "GUI.exe.bat":chkflag=1:bgscr 0,ginfo_dispx,ginfo_dispy,0,0,0
+if chkflag=0:exec dir_cur+"\\boot\\boot.exe"
+end
+*bios
+	cls
+	color 0,0,20
+	boxf 0,20,ginfo_winx,ginfo_winy
+	color 0,0,255
+	boxf 0,0,ginfo_winx,20
+	color 200,200,200:pos 0,0:mes "			 "+osname+" Graphical BIOS Setup"
+	notesel fastboot_set
+	noteload dir_cur+"\\boot\\setup.combos"
+	notesel theme_set
+	noteload dir_cur+"\\boot\\theme.combos"
+	notesel theme_list
+	noteload dir_cur+"\\boot\\theme_list.combos"
+x=0
+color 0,0,255
+pos 0,23
+mes "\nFastBoot
+	pos 350,40
+	if fastboot_set="1":a="Enabled
+	if fastboot_set="2":a="Disabled
+	button gosub a,*change_fastboot
+pos 0,50
+mes "\nTheme
+	pos 350,70
+a=0:objsize 120,24
+	combox a,120, theme_list
+pos 0,440
+	objsize 640,20
+	button "Save and reboot",*saveandreboot
+	button "Save and exit",*save
+stop
+*change_fastboot
+	if fastboot_set="1":objprm 0,"Disabled":fastboot_set="2":return
+	if fastboot_set="2":objprm 0,"Enabled":fastboot_set="1":return
+*saveandreboot
+	rebootflag=1
+*save
+	theme=str(a)
+	notesel theme
+	notesave dir_cur+"\\boot\\theme.combos"
+	notesel fastboot_set
+	notesave dir_cur+"\\boot\\setup.combos"
+	if rebootflag=1:goto *poweron:else:end
