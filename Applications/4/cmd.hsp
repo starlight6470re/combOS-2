@@ -1,0 +1,77 @@
+*start
+//Kpanさんのプログラムを使用させていただいております。ありがとうございます。
+//	エディトコントロール内文字色&背景色変更サンプル (by Kpan)
+notesel pass
+noteload dir_cur+"\\cmdpass.combos"
+notesel verload
+noteload dir_cur+"\\cmdpass.combos"
+noteget verload,0
+notesel version
+noteload verload+"\\version.combos"
+#include "script\\gdi32.as"
+#include "script\\hspext.as"
+#define ctype RGB(%1,%2,%3) (%1 | %2 << 8 | %3 << 16)
+	dim hInput, 2
+;	エディットコントロールが描画されるときに送られてくる
+;	ウィンドウメッセージ (WM_CTLCOLOREDIT)
+	oncmd gosub *ctlcoloredit, $133
+;	生成したカラーデータを破棄するための処理に必要
+	;onexit *exit_color
+	a = "combOS [version "+version+"]\n\n"+pass+">"
+	mesbox a,640,480,1,0
+	hInput.0 = objinfo(stat, 2)
+;	背景カラー用のブラシを生成しハンドルを取得。
+	CreateSolidBrush RGB($00, $00, $00)
+	hBrush.0 = stat
+*set
+repeat 560
+	aplkey 39
+loop
+wait 2
+repeat
+	getkey enter,13
+	if enter :goto *enterkey 
+	wait 5
+loop
+*enterkey
+	if a="combOS [version "+version+"]\n\n"+pass+">"+"help\n":gosub *help:goto *set//helpコマンドの処理
+	if a="combOS [version "+version+"]\n\n"+pass+">"+"shutdown\n":gosub *exit:goto *set//batコマンドの処理
+	if a="combOS [version "+version+"]\n\n"+pass+">"+"exit\n":gosub *endshell:goto *set//exitコマンドの処理
+	objprm 0,a+"\n入力された内容は、内部コマンド\nまたは外部コマンドとして認識されていません。\n\n"+pass+">"//それ以外
+goto *set
+	stop
+*ctlcoloredit
+;	lparamにオブジェクトのウィンドウハンドルが返る
+	if hInput.0 = lparam {
+		SetTextColor wparam, RGB($FF, $FF, $FF)
+;		テキスト背景色 (hBrush.0と同色を指定)
+		SetBkColor wparam, RGB($00, $00, $00)
+;		ボックス背景色
+		return hBrush.0
+	}
+	if hInput.1 = lparam {
+		SetTextColor wparam, RGB($00, $FF, $00)
+;		テキスト背景色 (hBrush.1と同色を指定)
+		SetBkColor wparam, RGB($FF, $00, $FF)
+		return hBrush.1
+	}
+	return
+*exit_color
+;	作成した背景カラー用のブラシを破棄
+	DeleteObject hBrush.1
+	DeleteObject hBrush.0
+	end
+*help
+	objprm 0,a+"\nhelp...ヘルプを表示します。\nshutdown...combOSを終了します。\nexit...シェルのみ終了します\n雰囲気だけなので他はできません。\n\n続行するには Y キーを押してください..."
+repeat
+	getkey y,89
+	if y :goto *helpcont 
+	wait 5
+loop
+*helpcont
+	cls
+	goto *start
+*exit
+	exec dir_sys + "\\taskkill.exe /F /T /IM GUI.exe", 2
+*endshell
+	end

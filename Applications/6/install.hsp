@@ -1,0 +1,154 @@
+#include "\\script\\hspinet.as"
+#include "\\script\\obj.as"
+*installstart
+	objmode 2
+	font "",40
+	objsize 320,50
+	pos 140,130
+mes "combOSインストーラ"
+	pos 150,170
+	button "インストール",*install
+	button "アンインストール",*uninstall
+	button gosub "終了",*exit
+	notesel setup
+	noteload "setup.combos"
+	if setup="1":objgray stat-2,0
+	if setup="0":objgray stat-1,0	
+	stop
+*install
+	cls
+	notesel pass
+	noteload dir_cur+"\\pass.combos"
+font "",50
+pos 230,150
+	mes "ようこそ"
+	objsize 200,50
+	pos 213,210
+objmode 2
+font "",40
+	button "続行",*install1
+	button gosub "終了",*exit
+	stop
+*install1
+	cls
+objmode 2
+font "",30
+username=""
+	objsize 200,35
+	mes "ユーザー名を入力してください"
+	input username
+	button "続行",*kakutei1
+	stop
+*kakutei1
+	dialog "ユーザー名は"+username+"でよろしいですか",2
+	if stat=6:goto *kakutei2
+	if stat=7:goto *install1
+*kakutei2
+	notesel username
+	delete pass+"\\setupfiles\\username.combos"
+	notesave pass+"\\setupfiles\\username.combos"
+dialog "ユーザー名をセーブしました。\n保存先:"+pass+"\\setupfiles\\username.combos"
+*install2
+	cls
+objmode 2
+font "",30
+password=""
+kakunin=""
+	objsize 200,35
+	mes "パスワードを入力してください"
+	input password
+	mes "確認です。もう一度入力してください"
+	input kakunin
+	button "続行",*kakutei3
+	button "設定しない",*kakutei4
+	stop
+*kakutei3
+	if password!kakunin:dialog "元と確認が一致しません。もう一度お試しください":goto *install2
+	notesel savepass
+	exist pass+"\\setupfiles\\password.combos"
+	b64encode savepass,password,9999
+	if strsize!-1:delete pass+"\\setupfiles\\password.combos"
+	notesave pass+"\\setupfiles\\password.combos"
+	dialog "パスワードを暗号化してセーブしました。\n保存先:"+pass+"\\setupfiles\\password.combos"
+goto *rootpass
+*kakutei4
+	dialog "本当に設定しなくてよろしいですか?",2
+	if stat=6:goto *rootpass
+	if stat=7:goto *install2
+dialog "例外が発生しました":end
+*rootpass
+cls
+objmode 2
+font "",30
+password=""
+kakunin=""
+	objsize 200,35
+	mes "管理用パスワードを入力してください。\n\nなるべく複雑なものがよいでしょう"
+	input password
+	mes "確認です。もう一度入力してください"
+	input kakunin
+	button "続行",*kakutei5
+	button "設定しない",*kakutei6
+	stop
+*kakutei5
+	if password!kakunin:dialog "元と確認が一致しません。もう一度お試しください":goto *install2
+	notesel savepass
+	exist pass+"\\setupfiles\\rootpass.combos"
+	b64encode savepass,password,9999
+	if strsize!-1:delete pass+"\\setupfiles\\rootpass.combos"
+	notesave pass+"\\setupfiles\\rootpass.combos"
+	dialog "パスワードを暗号化してセーブしました。\n保存先:"+pass+"\\setupfiles\\rootpass.combos"
+goto *finish
+*kakutei6
+	dialog "本当に設定しなくてよろしいですか?",2
+	if stat=6:goto *finish
+	if stat=7:goto *rootpass
+*finish
+	notesel setup
+	setup="1"
+	notesave "setup.combos"
+	cls
+	font "",30
+	mes "インストールは完了しました。\n再起動すればすぐに設定を更新できます"
+	font "",15
+	exec pass+"\\終了オプション.exe"
+	wait 300
+	end
+*uninstall
+	cls
+	dialog "本当にcombOSをアンインストールしますか?",3
+	if stat=6:goto *uninstall2//はい
+	if stat=7:gosub *exit//いいえ
+	end
+*uninstall2
+	mes "パスワードが設定されているか確認しています
+	exist "../../setupfiles\\password.combos"
+	if strsize=-1:mes "パスワードは設定されていませんでした。管理者パスワードを削除します。":goto *rootdelete
+	delete "../../setupfiles\\password.combos"
+	mes "パスワードは正常に削除されました"
+*rootdelete
+	mes "管理用パスワードが設定されているか確認しています"
+	exist "../../setupfiles\\rootpass.combos"
+	if strsize=-1:mes "管理者パスワードは設定されていませんでした。ユーザーを削除します。":goto *userdelete
+	delete "../../setupfiles\\rootpass.combos"
+	mes "管理用パスワードは正常に削除されました"
+*userdelete
+	notesel usernametemp:mes "変数を設定しています"
+	usernametemp="Live Session User":mes "変数にデフォルトユーザー名を代入しています"
+	notesave "../../setupfiles\\username.combos":mes "保存しています"
+	notesel flag:mes "インストール完了チェックのための変数を設定しています"
+	flag="0":mes "インストール完了チェックの設定を変更しています"
+	notesave "setup.combos":mes "インストール完了チェックへの設定を保存しています"
+	notesel message:mes "最終メッセージの変数を設定しています"
+	noteload "uninstall_massage.combos"
+	mes "すべてのプロセスが完了しました"
+	wait 200
+	cls
+	dialog message
+	end
+*exit
+	dialog "インストーラを終了します。\n保存していないデータは失われます。\nよろしいですか?",3
+	if stat=6:end
+	if stat=7:return
+	dialog "例外が発生しました"
+	end

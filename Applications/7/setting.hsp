@@ -1,0 +1,100 @@
+*start
+notesel tenji
+chdir "../../"
+noteload "setupfiles\\tenji.combos"
+if tenji="0":goto *tenjimode
+cls
+onexit *delete_temp
+#include "script\\hspinet.as"
+//設定ファイル読み込み
+notesel theme
+noteload "boot\\theme_list.combos
+notesel nowver
+noteload "version.combos
+//終了
+font "",40:mes "簡易設定"
+font "",20
+pos 0,70
+mes "アップデート"
+pos 150,70
+button gosub "更新確認",*update_check
+pos 0,100
+mes "初期化"
+pos 150,100
+button gosub "初期化",*reset
+pos 0,130
+mes "テーマ
+pos 150,130
+notesel theme_list
+noteload "setupfiles\\theme_list.combos"
+combox a,100, theme_list
+pos 230,128
+button gosub "保存",*save_theme
+pos 0,160
+mes "フルスクリーン"
+pos 150,160
+combox b,100, "有効\n無効"
+pos 230,160
+button gosub "保存",*screen_save
+pos 0,190
+mes "自動更新"
+pos 150,190
+combox c,100, "有効\n無効"
+pos 230,190
+button gosub "保存",*update_save
+pos 0,210:mes "*起動時自動的にインターネットに接続します。"
+stop
+*update_check
+dialog "インターネットに接続します。よろしいですか?",3
+if stat=6:goto *version_get
+if stat=7:return
+*version_get
+screen 1,410,180
+//BSDライセンス適応
+	netinit
+	if stat : dialog "ネット接続できません。" : end
+	neturl "http://combos.html.xdomain.jp/"
+	mes "DOWNLOAD 開始"
+	netload "upload_version.combos"
+	mes "DOWNLOAD 完了"
+	notesel dlver
+	noteload "upload_version.combos"
+	mes "最新バージョンは "+dlver+" です"
+	mes "現行バージョンは "+nowver+" です"
+	if dlver=nowver:mes "お使いのバージョンは最新です。":else:mes "お使いのcombOSは最新版ではありません。\n今すぐ更新しますか?":button "する",*update:button "しない",*sc1delete
+	stop
+*update
+	exist "reset_flag.combos"
+	if strsize=-1:bcopy "upload_version.combos","upload_version_temp.combos"
+	exec "up.exe"
+	end
+*reset
+	notesel flag
+	notesave "reset_flag.combos"
+	goto *update
+*delete_temp
+	exist "upload_version.combos"
+	if strsize!-1:delete "upload_version.combos"
+	exec dir_sys + "\\taskkill.exe /F /T /IM 7.exe", 2
+	end
+*save_theme
+	a=str(a)
+	notesel a
+	notesave "setupfiles\\GUI_theme.combos"
+	return
+*screen_save
+	b=str(b)
+	notesel b
+	notesave "setupfiles\\full_screen_set.combos"
+	return
+
+*update_save
+	c=str(c)
+	notesel c
+	notesave "setupfiles\\auto_update.combos"
+	return
+*tenjimode
+	dialog "このアプリケーションはcombOSの重要な設定を変更するため\n展示モードでは起動できません",1
+	end
+*sc1delete
+	screen 1,1,1,2

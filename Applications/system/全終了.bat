@@ -1,0 +1,14 @@
+taskkill.exe /F /T /IM 1.exe
+taskkill.exe /F /T /IM 2.exe
+taskkill.exe /F /T /IM 3.exe
+taskkill.exe /F /T /IM 4.exe
+taskkill.exe /F /T /IM 5.exe
+taskkill.exe /F /T /IM 6.exe
+taskkill.exe /F /T /IM 7.exe
+taskkill.exe /F /T /IM 8.exe
+taskkill.exe /F /T /IM 9.exe
+taskkill.exe /F /T /IM 暗号化.exe
+taskkill.exe /F /T /IM 6_.exe
+taskkill.exe /F /T /IM error.exe
+taskkill.exe /F /T /IM up.exe
+taskkill.exe /F /T /IM GUI.exe

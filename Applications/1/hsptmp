@@ -1,0 +1,23 @@
+gradf 0,0,640,480,1,$00ff00,$ffffff
+font "",40
+pos 40,100
+mes "実行するタスクを選択してください"
+objmode 2
+font "",40
+objsize 300,40
+pos 170,180
+button "暗号化",*angouka
+button "復号化",*hukugouka
+button "終了",*endq
+stop
+*angouka
+	exec "暗号化.exe"
+stop
+*hukugouka
+	exec "復号化.exe"
+stop
+*kani
+	exec "簡易暗号複合.exe"
+	stop
+*endq
+	end

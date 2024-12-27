@@ -1,0 +1,258 @@
+//アプリケーション:モールス信号送信機
+mydir=dir_cur
+color 0,0,0
+boxf 0,0,640,20
+cls
+mmload mydir+"\\sounds\\1.mp3",0,2
+mmload mydir+"\\sounds\\2.mp3",1,2
+font "",40
+pos 20,0
+mes "簡易モールス信号送信機"
+objmode 2
+objsize 60,40
+font "",30
+y=40:x=0
+pos x,y
+button "a",*adgh
+x+60
+pos x,y
+button "b",*bg
+x+60
+pos x,y
+button "c",*cg
+x+60
+pos x,y:x+60
+button "d",*dg
+pos x,y:x+60
+button "e",*eg
+pos x,y:x+60
+button "f",*fg
+pos x,y:x+60
+button "g",*gg
+pos x,y:x+60
+button "h",*hg1
+pos x,y:x+60
+button "i",*ig
+pos x,y:x=0:y+40
+button "j",*jg
+pos x,y:x+60
+button "k",*kg
+pos x,y:x+60
+button "l",*lg
+pos x,y:x+60
+button "m",*mg
+pos x,y:x+60
+button "n",*ng
+pos x,y:x+60
+button "o",*og
+pos x,y:x+60
+button "p",*pg
+pos x,y:x+60
+button "q",*qg
+pos x,y:x+60
+button "r",*rgi
+pos x,y:x+60
+button "s",*sg
+pos x,y:x=0:y+40
+button "t",*tg
+pos x,y:x+60
+button "u",*ug
+pos x,y:x+60
+button "v",*vg
+pos x,y:x+60
+button "w",*wg
+pos x,y:x+60
+button "x",*x2g
+pos x,y:x+60
+button "y",*y2g
+pos x,y:x+60
+button "z",*zg
+pos x,y:x+60
+button "訂正",*teisei
+pos x,y
+button "終了",*endq
+pos 0,180
+picload mydir+"\\images\\"+"もーるす.jpg",1
+pos 370,180
+as="送信済み文字\n"
+mesbox as,270,300,0,9999999999999999999999999999999999
+stop
+*adgh
+	mmplay 0
+	mmplay 1
+	objprm 28,as+"a"
+	stop
+*bg
+	mmplay 0
+	repeat 3
+	mmplay 1
+	loop
+	objprm 28,as+"b"
+	stop
+*cg
+	repeat 2
+	mmplay 0
+	mmplay 1
+	loop
+	objprm 28,as+"c"
+	stop
+*dg
+	mmplay 0
+	repeat 2
+	mmplay 1
+	loop
+	objprm 28,as+"d"
+	stop
+*eg
+	mmplay 1
+	objprm 28,as+"e"
+	stop
+*fg
+	repeat 2
+	mmplay 1
+	loop
+	mmplay 0
+	mmplay 1
+	objprm 28,as+"f"
+	stop
+*gg
+	repeat 2
+	mmplay 0
+	loop
+	mmplay 1
+	objprm 28,as+"g"
+	stop
+*hg1
+	repeat 4
+	mmplay 1
+	loop
+	objprm 28,as+"h"
+	stop
+*ig
+	repeat 2
+	mmplay 1
+	loop
+	objprm 28,as+"i"
+	stop
+*jg
+	mmplay 1
+	repeat 3
+	mmplay 0 
+	loop
+	objprm 28,as+"j"
+	stop
+*kg
+	mmplay 0
+	mmplay 1
+	mmplay 0
+	objprm 28,as+"k"
+	stop
+*lg
+	mmplay 1
+	mmplay 0
+	repeat 2
+	mmplay 1
+	loop
+	objprm 28,as+"l"
+	stop
+*mg
+	repeat 2
+	mmplay 0
+	loop
+	objprm 28,as+"m"
+	stop
+*ng
+	mmplay 0
+	mmplay 1
+	objprm 28,as+"n"
+	stop
+*og
+	repeat 3
+	mmplay 0
+	loop
+	objprm 28,as+"o"
+	stop
+*pg
+	mmplay 1
+	repeat 2
+	mmplay 0
+	loop
+	mmplay 1
+	objprm 28,as+"p"
+	stop
+*qg
+	repeat 2
+	mmplay 0
+	loop
+	mmplay 1
+	mmplay 0
+	objprm 28,as+"q"
+	stop
+*rgi
+	mmplay 1
+	mmplay 0
+	mmplay 1
+	objprm 28,as+"r"
+	stop
+*sg
+	repeat 3
+	mmplay 1
+	loop
+	objprm 28,as+"s"
+	stop
+*tg
+	mmplay 0
+	objprm 28,as+"t"
+	stop
+*ug
+	repeat 2
+	mmplay 1
+	loop
+	mmplay 0
+	objprm 28,as+"u"
+	stop
+*vg
+	repeat 3
+	mmplay 1
+	loop
+	mmplay 0
+	objprm 28,as+"v"
+	stop
+*wg
+	mmplay 1
+	repeat 2
+	mmplay 0
+	loop
+	objprm 28,as+"w"
+	stop
+*x2g
+	mmplay 0
+	mmplay 1
+	mmplay 1
+	mmplay 0
+	objprm 28,as+"x"
+	stop
+*y2g
+	mmplay 0
+	mmplay 1
+	mmplay 0
+	mmplay 0
+	objprm 28,as+"y"
+	stop
+*zg
+	mmplay 0
+	mmplay 0
+	mmplay 1
+	mmplay 1
+	objprm 28,as+"z"
+	stop
+*teisei
+	mmplay 1
+	mmplay 1
+	mmplay 1
+	mmplay 0
+	mmplay 1
+	objprm 28,as+"←"
+	stop
+*endq
+	end
